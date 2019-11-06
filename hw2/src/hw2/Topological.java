@@ -197,7 +197,7 @@ public class Topological {
         return list;
     }
 
-    //   check the order that given subject how to do with fre-requ..
+    //   check the order that given subject how to do with fre-req..
     public void checkOrder(String v) {
 
         int point = courseList.indexOf(v); // find the index for input subject
