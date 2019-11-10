@@ -6,6 +6,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+//-----------------------------------------------------
+// Title: Planner class
+// Author: Oguzhan Ugur Sarisakaloglu
+// ID: 39274105326
+// Section: 1
+// Assignment: 2
+// Description: This class tests the assignment and gets inputs
+// and returns results by connecting topological.java.
+//-----------------------------------------------------
 public class Planner {
     public static void main(String[] args) throws NumberFormatException, IOException {
         
@@ -16,46 +25,76 @@ public class Planner {
         // create scanner
         Scanner scanner = new Scanner(System.in);
         
-        
-        
-        int maxCourcePerSemester = Integer.parseInt(args[0]);
+        // get input for maximum course count in per semester
+        int maxCoursePerSemester = Integer.parseInt(args[0]);
+
+        // initialize finput file name
         String fileName = args[1];
 
-        courseGraph.loadGraph(fileName); // load the graph
-        courseGraph.topologicalSort(); // sort the graph using topological sort
-        String[] courceList = courseGraph.listShedule(maxCourcePerSemester); // shedule the cource acoding to the given maximun number
+        // load the graph according to input file
+        courseGraph.loadGraph(fileName);
+
+        // sort the graph using topological sort
+        courseGraph.topologicalSort();
+
+        // schedule the courses according to the given limit of course
+        String[] courceList = courseGraph.listShedule(maxCoursePerSemester);
 
         for (int i = 0; i < 8; i++) {
-            System.out.println(courceList[i]); // print the cource for each semester
+
+            // print the courses for 8 semesters
+            System.out.println(courceList[i]);
         }
+
         while (true) {
+
             // reconstruct the unsorted adjacency matrix
             for (int i = 0; i < courseGraph.grapg.adjMatrix.length; i++) {
                 for (int j = 0; j < courseGraph.grapg.adjMatrix.length; j++) {
                     courseGraph.grapg.adjMatrix[i][j] = courseGraph.grapg.copyAdj[i][j];
                 }
             }
+
+
+
             System.out.print("Enter choice (0: Exit, 1: List schedule, 2: Check order, 3: change load):");
             int input = scanner.nextInt(); // user input integer
 
-
-            if (input == 0) { // exit from the program..
+            // exit from the program
+            if (input == 0) {
                 System.exit(-1);
 
             } else if (input == 1) { // same as the user input 3, but in this user can't enter new load
-                System.out.println("The program will schedule " + maxCourcePerSemester + " courses per semester.");
-                String[] array = courseGraph.listShedule(maxCourcePerSemester);
+                System.out.println("The program will schedule " + maxCoursePerSemester + " courses per semester.");
+
+                // return results from constructed courseGraph object.
+                String[] array = courseGraph.listShedule(maxCoursePerSemester);
+
+                // then print them
                 for (int i = 0; i < 8; i++) {
                     System.out.println(array[i]);
                 }
-            } else if (input == 2) {
+
+            } else if (input == 2) { // print schedule
+
+
                 String subject = "";
+
                 System.out.print("Enter course: ");
-                String test = scanner.nextLine();
-                subject = scanner.nextLine();
+
+                // Get course name which checked
+                subject = scanner.next();
+
+                // We need free indexList
                 courseGraph.indexList.clear();
+
+                //
                 courseGraph.checkOrder(subject);
-                // System.out.println(courseGraph.indexList);
+
+
+
+
+                System.out.println(courseGraph.indexList);
                 List<Integer> list = new ArrayList<Integer>();
                 System.out.print("You should take " + subject + " after ");
                 for (int i = 0; i < courseGraph.indexList.size(); i++) {
@@ -77,7 +116,7 @@ public class Planner {
             } else if (input == 3) {
                 System.out.print("Enter new course load: ");
                 int newLoad = scanner.nextInt();
-                maxCourcePerSemester = newLoad; // get the new load as a user input
+                maxCoursePerSemester = newLoad; // get the new load as a user input
                 System.out.println("The program will schedule " + newLoad + " courses per semester.");
                 String[] newLoadArray = courseGraph.listShedule(newLoad); // re-shedule the list for given load value
                 for (int i = 0; i < 8; i++) {

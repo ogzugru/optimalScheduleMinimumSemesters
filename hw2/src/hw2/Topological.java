@@ -197,18 +197,29 @@ public class Topological {
         return list;
     }
 
-    //   check the order that given subject how to do with fre-req..
+    //   In this class we find required courses by recursively then put them into indexlist one by one.
     public void checkOrder(String v) {
 
-        int point = courseList.indexOf(v); // find the index for input subject
+        // find the index of course v i courseList
+        int point = courseList.indexOf(v);
 
-        for (int i = 0; i < grapg.adjMatrix.length; i++) { // go through top to bottom and find 1's
+        for (int i = 0; i < grapg.adjMatrix.length; i++) {
+
             if (grapg.adjMatrix[i][point] == 1) {
-                if (!indexList.contains(i)) { // if found 1, and index for that 1 is not exist on indexList,
-                    indexList.add(i); // put it in to indexList
+
+                // There is edge in i to point
+
+                if (!indexList.contains(i)) { // if found 1, and index for that
+                    // 1 is not contained on indexList, put it in to indexList
+                    indexList.add(i);
                 }
-                String newObj = courseList.get(i);
-                checkOrder(newObj);
+
+                String newCourse = courseList.get(i);
+
+                // call same method for required course
+                checkOrder(newCourse);
+
+
             }
 
         }
