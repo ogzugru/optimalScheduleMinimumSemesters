@@ -8,8 +8,16 @@ import java.util.Scanner;
 
 public class Planner {
     public static void main(String[] args) throws NumberFormatException, IOException {
+        
+        
+        // create Empty Topological Object
         Topological courseGraph = new Topological();
+        
+        // create scanner
         Scanner scanner = new Scanner(System.in);
+        
+        
+        
         int maxCourcePerSemester = Integer.parseInt(args[0]);
         String fileName = args[1];
 
