@@ -8,11 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+//-----------------------------------------------------
+// Title: Topological class
+// Author: Oguzhan Ugur Sarisakaloglu
+// ID: 39274105326
+// Section: 1
+// Assignment: 2
+// Description: This class we store graph and vertex class and we can provide topological sort in here.
+//-----------------------------------------------------
+
 class Vertex {
-    public String lable;
+    public String key;
 
     public Vertex(String ch) {
-        lable = ch;
+        key = ch;
     }
 }
 
@@ -41,8 +50,8 @@ class Graph {
 public class Topological {
 
     public List<String> courseList = new ArrayList<String>();
-    public Stack<Integer> st = new Stack<Integer>();
-    public Graph grapg;
+    public Stack<Integer> st = new Stack<Integer>(); // that stores he reverse
+    public Graph dag;
     public List<Integer> indexList = new ArrayList<Integer>();
 
     //  load the graph
@@ -65,31 +74,38 @@ public class Topological {
         BufferedReader br = new BufferedReader(new FileReader(input_file.getAbsolutePath()));
 
         String line = null;
-        String courceName = null;
+        String courseName = null;
+
         int maxCount = Integer.parseInt(br.readLine());
-        grapg = new Graph(maxCount);
 
         //  first create list of vertices
         int count = 0;
         try {
             while (count < maxCount) {
                 line = br.readLine();
-                courceName = line.split(" ")[0];
-                courseList.add(courceName);
+                courseName = line.split(" ")[0];
+                courseList.add(courseName);
                 count++;
             }
 
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
-        br.close();
-        //  create a Graph object...
+        br.close(); // close buffer reader, program has all of courses
 
 
-        // add vertices for all courses to the graph
+        //  create a Graph object with maxCount
+        dag = new Graph(maxCount);
+
+
+        // create vertex for all courses in input, to the graph
         for (int i = 0; i < courseList.size(); i++) {
-            grapg.addVertex(courseList.get(i));
+            dag.addVertex(courseList.get(i));
         }
+
+
+
+
         //  create new reader object to set edges between verises.
         BufferedReader bfr = new BufferedReader(new FileReader(input_file.getAbsolutePath()));
         String xx = bfr.readLine(); // ignore the that value.
@@ -99,11 +115,11 @@ public class Topological {
         while (addEdgeCount < maxCount) {
             line = bfr.readLine();
             int endPoint = courseList.indexOf(line.split(" ")[0]);
-            int i = 1;
+            int i = 1; /// if it is 0, program gets name of course
             String[] split = line.split(" ");
             while (i < split.length) {
                 int startPoint = courseList.indexOf(split[i]);
-                grapg.addEdge(startPoint, endPoint); // create an edge
+                dag.addEdge(startPoint, endPoint); // create an edge
                 i++;
             }
             addEdgeCount++;
@@ -116,19 +132,26 @@ public class Topological {
 
         //  create a temporary adjacency matrix for future work.
         //   because when creating a sorted list adjecency matrix will be changed.
-        for (int i = 0; i < grapg.adjMatrix.length; i++) {
-            for (int j = 0; j < grapg.adjMatrix.length; j++) {
-                grapg.copyAdj[i][j] = grapg.adjMatrix[i][j];
+        for (int i = 0; i < dag.adjMatrix.length; i++) {
+            for (int j = 0; j < dag.adjMatrix.length; j++) {
+                dag.copyAdj[i][j] = dag.adjMatrix[i][j];
             }
         }
-        for (int z = 0; z < grapg.adjMatrix.length; z++) {
-            for (int i = 0; i < grapg.adjMatrix.length; i++) {
+
+
+        // Process nodes in a topologically sorted order,
+        // sort them with topological sort
+        for (int z = 0; z < dag.adjMatrix.length; z++) {
+
+            for (int i = 0; i < dag.adjMatrix.length; i++) {
+
                 boolean test = false;
-                for (int j = 0; j < grapg.adjMatrix.length; j++) {
-                    if (grapg.adjMatrix[j][i] == 1) {
+
+                for (int j = 0; j < dag.adjMatrix.length; j++) {
+                    if (dag.adjMatrix[j][i] == 1) {
                         test = true;
                     }
-                    // System.out.print(grapg.adjMatrix[i][j] + " ");
+                    // System.out.print(dag.adjMatrix[i][j] + " ");
                 }
                 if (test == false) {
                     int x = st.search(i);
@@ -137,15 +160,19 @@ public class Topological {
                     }
                 }
             }
+
             for (int m = 0; m < st.size(); m++) {
-                int temp = st.get(m);
                 // System.out.println(temp);
-                for (int k = 0; k < grapg.adjMatrix.length; k++) {
-                    grapg.adjMatrix[temp][k] = 0;
+                for (int k = 0; k < dag.adjMatrix.length; k++) {
+                    dag.adjMatrix[st.get(m)][k] = 0;
                 }
             }
 
         }
+
+
+
+
     }
 
     //  list schedule.....//
@@ -154,42 +181,48 @@ public class Topological {
         for (int i = 0; i < st.size(); i++) {
         }
         //  re-create adjcency matrix usinf copyAdj matrix
-        for (int i = 0; i < grapg.adjMatrix.length; i++) {
-            for (int j = 0; j < grapg.adjMatrix.length; j++) {
-                grapg.adjMatrix[i][j] = grapg.copyAdj[i][j];
+        for (int i = 0; i < dag.adjMatrix.length; i++) {
+            for (int j = 0; j < dag.adjMatrix.length; j++) {
+                dag.adjMatrix[i][j] = dag.copyAdj[i][j];
             }
         }
 
         int textc = 0;
+
         for (int i = 0; i < 8; i++) {
+
+
             String temp = "";
-            int cCount = 0;
-            List<Integer> myCoords = new ArrayList<Integer>();
+            int currentSemester = 0;
+            List<Integer> tempCoords = new ArrayList<Integer>();
             temp = temp + "semester " + String.valueOf(i + 1) + " : ";
-            for (int courceCount = textc; courceCount < st.size(); courceCount++) {
+            
+            
+            
+            for (int courseCount = textc; courseCount < st.size(); courseCount++) {
                 boolean check = false;
-                int num = st.get(courceCount);
-                for (int col = 0; col < grapg.adjMatrix.length; col++) {
-                    if (grapg.adjMatrix[col][num] == 1) {
+                int num = st.get(courseCount);
+                for (int col = 0; col < dag.adjMatrix.length; col++) {
+                    if (dag.adjMatrix[col][num] == 1) {
                         check = true;
 
                     }
                 }
-                if (check == false && cCount < maxNumberOfCourses) {
-                    if (!myCoords.contains(st.get(courceCount))) {
-                        myCoords.add(st.get(courceCount));
+                if (check == false && currentSemester < maxNumberOfCourses) {
+                    if (!tempCoords.contains(st.get(courseCount))) {
+                        tempCoords.add(st.get(courseCount));
                     }
-                    temp = temp + courseList.get(st.get(courceCount)) + " ";
-                    cCount++;
+                    temp = temp + courseList.get(st.get(courseCount)) + " ";
+                    currentSemester++;
                     textc++;
                 }
 
             }
             list[i] = temp;
-            for (int x = 0; x < myCoords.size(); x++) {
-                int z = myCoords.get(x);
-                for (int y = 0; y < grapg.adjMatrix.length; y++) {
-                    grapg.adjMatrix[z][y] = 0;
+            for (int x = 0; x < tempCoords.size(); x++) {
+                int z = tempCoords.get(x);
+                for (int y = 0; y < dag.adjMatrix.length; y++) {
+                    dag.adjMatrix[z][y] = 0;
                 }
             }
 
@@ -197,18 +230,27 @@ public class Topological {
         return list;
     }
 
-    //   check the order that given subject how to do with fre-req..
+    //   In this class we find required courses by recursively then put them into indexlist one by one.
     public void checkOrder(String v) {
 
-        int point = courseList.indexOf(v); // find the index for input subject
+        // find the index of course v i courseList
+        // int point = courseList.indexOf(v);
 
-        for (int i = 0; i < grapg.adjMatrix.length; i++) { // go through top to bottom and find 1's
-            if (grapg.adjMatrix[i][point] == 1) {
-                if (!indexList.contains(i)) { // if found 1, and index for that 1 is not exist on indexList,
-                    indexList.add(i); // put it in to indexList
+        for (int i = 0; i < dag.adjMatrix.length; i++) {
+
+            if (dag.adjMatrix[i][courseList.indexOf(v)] == 1) {
+
+                // There is edge in i to point
+
+                if (!indexList.contains(i)) { // if found 1, and index for that
+                    // 1 is not contained on indexList, put it in to indexList
+                    indexList.add(i);
                 }
-                String newObj = courseList.get(i);
-                checkOrder(newObj);
+
+                // call same method for required course
+                checkOrder(courseList.get(i));
+
+
             }
 
         }
